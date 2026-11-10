@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Exam Timetable Generator</title>
+<meta name="description" content="Clash-free exam timetables using graph colouring, set theory and adjacency matrices.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Discrete Mathematical Structures</p>
+    <h1>Smart Exam Timetable Generator</h1>
+    <p class="lede">Each subject is a <b>vertex</b>. Two subjects are joined by an <b>edge</b> if some student takes both. Colouring the graph so that no edge joins two same-coloured vertices gives every subject a time slot with <b>zero clashes</b>.</p>
+    <nav class="concepts" aria-label="Concepts used">
+      <a href="#sets">Set Theory</a>
+      <a href="#graph">Graph Theory</a>
+      <a href="#repr">Adjacency Matrix / List</a>
+      <a href="#timetable">Graph Colouring</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="input" class="card">
+    <h2>1 · Enter the data</h2>
+    <p class="hint">One subject per line: <code>Subject: student, student, …</code> — each line defines the <b>set</b> of students enrolled in that subject.</p>
+    <div class="grid2">
+      <div>
+        <label for="data">Subjects &amp; enrolled students</label>
+        <textarea id="data" rows="12" spellcheck="false"></textarea>
+        <div class="row">
+          <button id="sample" class="ghost" type="button">Load sample</button>
+          <button id="random" class="ghost" type="button">Random data</button>
+        </div>
+      </div>
+      <div class="opts">
+        <label for="algo">Colouring algorithm</label>
+        <select id="algo"></select>
+        <label for="start">First exam day</label>
+        <input id="start" type="date">
+        <label for="per">Sessions per day</label>
+        <select id="per">
+          <option value="1">1 (Morning)</option>
+          <option value="2" selected>2 (Morning, Afternoon)</option>
+          <option value="3">3 (Morning, Afternoon, Evening)</option>
+        </select>
+        <label class="check"><input id="wk" type="checkbox" checked> Skip weekends</label>
+        <button id="gen" class="primary" type="button">Generate timetable</button>
+        <p id="err" class="err" role="alert"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="stats" class="stats" aria-live="polite"></section>
+
+  <section id="sets" class="card">
+    <h2>2 · Set theory: finding clashes</h2>
+    <p class="hint">Pick two subjects. Their enrolment sets decide whether they may share a slot: <b>A ∩ B ≠ ∅</b> means a clash, so an edge is drawn.</p>
+    <div class="row">
+      <label class="inline">A <select id="selA"></select></label>
+      <label class="inline">B <select id="selB"></select></label>
+    </div>
+    <div id="setout" class="setout"></div>
+  </section>
+
+  <section id="graph" class="card">
+    <h2>3 · Conflict graph &amp; colouring</h2>
+    <p class="hint">Vertices are coloured by time slot. Hover an edge to see the students that cause the conflict. Drag the slider to replay the colouring step by step.</p>
+    <div class="row">
+      <label class="inline grow">Step <input id="step" type="range" min="0" max="0" value="0"></label>
+      <span id="steplbl" class="mono"></span>
+    </div>
+    <div class="graphbox"><svg id="svg" viewBox="0 0 700 520" role="img" aria-label="Conflict graph"></svg><div id="tip" class="tip" hidden></div></div>
+    <div id="legend" class="legend"></div>
+  </section>
+
+  <section id="repr" class="card">
+    <h2>4 · Graph representation</h2>
+    <div class="grid2">
+      <div>
+        <h3>Adjacency matrix</h3>
+        <p class="hint">Entry (i, j) = 1 when subjects i and j share a student. Symmetric, zero diagonal.</p>
+        <div class="scroll"><table id="matrix" class="matrix"></table></div>
+      </div>
+      <div>
+        <h3>Adjacency list</h3>
+        <p class="hint">Each vertex with its neighbours (and degree).</p>
+        <ul id="alist" class="alist"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="timetable" class="card">
+    <h2>5 · Generated timetable</h2>
+    <p class="hint">Every colour class is an <b>independent set</b>: no two subjects in it have a student in common.</p>
+    <div class="scroll"><table id="ttable" class="ttable"></table></div>
+    <div id="verify" class="verify"></div>
+    <div class="row"><button id="csv" class="ghost" type="button">Download CSV</button><button id="print" class="ghost" type="button">Print</button></div>
+  </section>
+
+  <section class="card">
+    <h2>How it works</h2>
+    <ol class="how">
+      <li><b>Sets.</b> Each subject S has a set of students E(S).</li>
+      <li><b>Intersection.</b> Subjects A and B clash iff E(A) ∩ E(B) ≠ ∅. The union E(A) ∪ E(B) is the number of students affected by the pair, and E(A) − E(B) the students unaffected by B.</li>
+      <li><b>Graph.</b> G = (V, E) with V the subjects and an edge for every clashing pair, stored as an adjacency matrix and adjacency list.</li>
+      <li><b>Colouring.</b> A proper colouring assigns each vertex a colour so adjacent vertices differ. Colour = time slot, so the number of colours used = the number of slots needed. The minimum possible is the chromatic number χ(G); the largest clique gives a lower bound ω(G) ≤ χ(G).</li>
+    </ol>
+  </section>
+</main>
+
+<footer class="wrap foot">Built with plain HTML, CSS and JavaScript — no dependencies.</footer>
+
+<script src="js/sets.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/coloring.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
